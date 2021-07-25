@@ -30,22 +30,13 @@ async def on_message(message):
         await message.channel.send("Oula jermana, ya compraste tu paleta de James Charles hoy?:sunglasses:")
 
     if message.content == "Chisme":
-        flag = 0
-        n = random.randint(1, 3)
-        if n == 1 and flag is not n:
-            await message.channel.send("A ver :eyes: Mira, haz de cuenta que hay algunos cangrejos bien fresones en este servidor :strawberry:, pero pues como soy buena onda y todo, no voy a soltar nombres :face_with_hand_over_mouth::nail_care:")
-            flag = n
-        elif n == 2 and flag is not n:
-            await message.channel.send("La Gordita a veces me cansa :sleepy::neutral_face:")
-            flag = n
-        else:
-            await message.channel.send("Ugh, so not to be rude or anything, but like masculinity is basically just a social construct :woman_technologist:")
-            flag = n
-
-
+        n = random.randint(0, 11)
+        chisme_list = ["A ver :eyes: Mira, haz de cuenta que hay algunos cangrejos bien fresones en este servidor :strawberry:, pero pues como soy buena onda y todo, no voy a soltar nombres :face_with_hand_over_mouth::nail_care:", "La Gordita a veces me cansa :sleepy::neutral_face:",
+        "Secretos tengo pocos, pero chismes tengo muchos :woman_tipping_hand:", "Ugh, so not to be rude or anything, but like masculinity is basically just a social construct :woman_technologist:", "Not gonna lie, British people with like thick Spanish accents are just straight daddies from heaven", "La Ruidosa, siempre que está a dieta, me pone de entrenadora personal, literal como si yo ya supiera cómo bajar de peso:unamused:", "AyÚDENME quE yO tENGO muCHOS quERACERES :triumph::card_box:", "Mi psicóloga me quiere meter a terapia de conversión por ser “intolerablemente femenina,” o sea qué pedo??", "“Tan difícil es dejar de comer lumpia?” murmuró mi mami el otro día, y yo estuve con cara de ni que fuera a engordar como tú, señora hipopótamo :upside_down::flag_ph:", "La Cariñosa is gonna like do my nails tonight, and OMG I’m like SOOOO pumped you literally have no idea :raised_hands::nail_care:", "Dicen que lo que no mata, te hace más fuerte, pero ufff la mirada del peruano que me encontré hoy, se sentía tanto letal como debilitante :heart_eyes::drooling_face::heart:", "El que tenga un acento paisa, será el que más prioridad va a tener en mi lista de futuros esposos :smirk::flag_co:"]
+        await message.channel.send(chisme_list[n])
 
     elif message.content == "Chismosa no hablo inglés":
         await message.channel.send("Omg, tienes que descargar Duolingou :mobile_phone:")
 
 
-client.run("ODYyNzg2MTg4NjQ1NjI5OTcz.YOdaQQ.DmTEWMFEtX_abrRtyGcyaewDWqk")
+client.run("ODYyNzg2MTg4NjQ1NjI5OTcz.YOdaQQ.Y_fiod5Z8Lro5OccTR3b9TQDjuw")
