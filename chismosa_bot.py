@@ -25,7 +25,7 @@ def get_quote():
     return(quote)
 
 def get_chisme():
-    chisme = requests.get('http://143.198.232.116/random').json()['quote']
+    chisme = requests.get('https://jasonpersonaldomain.com/chismosabot/random').json()['quote']
     return chisme
 
 @client.event
@@ -75,11 +75,10 @@ async def on_message(message):
     if message.content.startswith("Hi sister"):
         await message.channel.send("Oula jermana, ya compraste tu paleta de James Charles hoy?:sunglasses:")
 
-    if message.content.startswith("Chisme") or message.content.startswith("chisme"):
-        #chisme = get_chisme()
-        #await message.channel.send(chisme)
-        #print(chisme)
-        await message.channel.send("Esto es un chisme, pronto volverán xd")
+    if message.content.startswith("Chisme".lower()):
+        chisme = get_chisme()
+        await message.channel.send(chisme)
+        # await message.channel.send("Esto es un chisme, pronto volverán xd")
 
     if message.content.startswith("Chismosa té") or message.content.startswith("chismosa té") or message.content.startswith("chismosa te"):
         await message.channel.send("Derrama el té sister!!!:tea:")
