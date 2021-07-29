@@ -5,11 +5,13 @@ import requests
 import json
 from discord.ext import commands
 from datetime import date
+from dotenv import load_dotenv
 
 
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix=',', intents=intents)
+load_dotenv('.env')
 
 def get_all_members():
     guild = client.get_guild(862542952937029632)
@@ -85,4 +87,4 @@ async def on_message(message):
     elif message.content == "Chismosa no hablo inglés" or message.content == "chismosa no hablo ingles" or message.content == "chismosa no hablo ingles":
         await message.channel.send("Omg, tienes que descargar Duolingou :mobile_phone:")
 
-client.run("")
+client.run(os.getenv('BOT_TOKEN'))
