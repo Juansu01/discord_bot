@@ -6,7 +6,7 @@ import json
 from discord.ext import commands
 from datetime import date
 from dotenv import load_dotenv
-
+import re
 
 intents = discord.Intents.default()
 intents.members = True
@@ -54,6 +54,14 @@ def get_member_days(member):
     delta = date0 - date1
     return delta.days
 
+def remove_tag(username):
+    chars = []
+    for char in username:
+        if char == '#':
+            break
+        chars.append(char)
+    return "".join(chars)
+
 
 @client.event
 async def on_message(message):
@@ -83,10 +91,23 @@ async def on_message(message):
         chisme = get_chisme()
         await message.channel.send(chisme)
 
-    if message.content.startswith("Chismosa té") or message.content.startswith("chismosa té") or message.content.startswith("chismosa te"):
+    if re.match(re.compile("chismosa (te|té)", re.I), message.content):
         await message.channel.send("Derrama el té sister!!!:tea:")
 
-    elif message.content == "Chismosa no hablo inglés" or message.content == "chismosa no hablo ingles" or message.content == "chismosa no hablo ingles":
+    if re.match("days [a-z0-9_]+", message.content.lower()):
+        members = get_all_members()
+        username = message.content.split()[1]
+        print(username)
+        for member in members:
+            if remove_tag(str(member)).lower() == username.lower():
+                print(member, username)
+                await message.channel.send("@{} has been in the server for {} days!".format(remove_tag(str(member)), get_member_days(member)))
+
+    if re.match(re.compile("chismosa no hablo (inglés|ingles)", re.I), message.content):
         await message.channel.send("Omg, tienes que descargar Duolingou :mobile_phone:")
+
+@client.event
+async def get_member_day(message):
+    print('working')
 
 client.run(os.getenv('BOT_TOKEN'))
