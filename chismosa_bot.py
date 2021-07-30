@@ -34,6 +34,27 @@ def get_chisme():
 async def on_ready():
     print("Our bot is logged in as {0.user}".format(client))
 
+def get_member_days(member):
+    today = date.today()
+    d1 = today.strftime("%d/%m/%Y")
+    mem_join = member.joined_at
+    member_join_date = mem_join.strftime("%d/%m/%Y")
+    date0 = d1
+    date1 = member_join_date
+    day0 = int(date0[:2])
+    morep0 = date0.replace("/", "")
+    month0 = int(morep0[2:-4])
+    year0 = int(date0[6:])
+    day1 = int(date1[:2])
+    morep1 = date1.replace("/", "")
+    month1 = int(morep1[2:-4])
+    year1 = int(date1[6:])
+    date0 = date(year0, month0, day0)
+    date1 = date(year1, month1, day1)
+    delta = date0 - date1
+    return delta.days
+
+
 @client.event
 async def on_message(message):
 
@@ -48,27 +69,8 @@ async def on_message(message):
 
     if message.content == "members_count":
         mem_list = get_all_members()
-        guild = client.get_guild(862542952937029632)
-        guild_create = guild.created_at
-        today = date.today()
-        d1 = today.strftime("%d/%m/%Y")
         for member in mem_list:
-            mem_join = member.joined_at
-            member_join_date = mem_join.strftime("%d/%m/%Y")
-            date0 = d1
-            date1 = member_join_date
-            day0 = int(date0[:2])
-            morep0 = date0.replace("/", "")
-            month0 = int(morep0[2:-4])
-            year0 = int(date0[6:])
-            day1 = int(date1[:2])
-            morep1 = date1.replace("/", "")
-            month1 = int(morep1[2:-4])
-            year1 = int(date1[6:])
-            date0 = date(year0, month0, day0)
-            date1 = date(year1, month1, day1)
-            delta = date0 - date1
-            print("Member: {} Days in server: {}".format(member, delta.days))
+            print("Member: {} Days in server: {}".format(member, get_member_days(member)))
 
     if message.content == "Chismosa I'm depressed":
         quote = get_quote()
