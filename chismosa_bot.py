@@ -11,6 +11,31 @@ intents.members = True
 client = commands.Bot(command_prefix=',', intents=intents)
 load_dotenv('.env')
 
+def get_all_members():
+    guild = client.get_guild(862542952937029632)
+    memberList = guild.members
+    return memberList
+
+def get_member_days(member):
+    today = date.today()
+    d1 = today.strftime("%d/%m/%Y")
+    mem_join = member.joined_at
+    member_join_date = mem_join.strftime("%d/%m/%Y")
+    date0 = d1
+    date1 = member_join_date
+    day0 = int(date0[:2])
+    morep0 = date0.replace("/", "")
+    month0 = int(morep0[2:-4])
+    year0 = int(date0[6:])
+    day1 = int(date1[:2])
+    morep1 = date1.replace("/", "")
+    month1 = int(morep1[2:-4])
+    year1 = int(date1[6:])
+    date0 = date(year0, month0, day0)
+    date1 = date(year1, month1, day1)
+    delta = date0 - date1
+    return delta.days
+
 @client.event
 async def get_member_day(message):
     print('working')
@@ -49,6 +74,13 @@ async def on_message(message):
 
     if re.match(re.compile("chismosa (te|té)", re.I), message.content):
         await message.channel.send("Derrama el té sister!!!:tea:")
+    
+    if re.match(re.compile("days all", re.I), message.content):
+        members = get_all_members()
+        names = []
+        for member in members:
+            names.append("@{}: {} days".format(remove_tag(str(member)), get_member_days(member)))
+        await message.channel.send("\n".join(names))
 
     if re.match("days [a-z0-9_]+", message.content.lower()):
         members = get_all_members()
@@ -71,32 +103,8 @@ async def on_message(message):
     if re.search(re.compile("s+h+o+(pp)+i+n+g+", re.I), message.content):
         await message.channel.send("Omg did someone say shopping!:shopping_bags:")
 
-    if re.match(re.compile("send nudes", re.I), message.content):
+    if re.match(re.compile("s+e+n+d+ n+u+d+e+s+", re.I), message.content):
         await message.channel.send("At least take me to dinner first!:flushed:")
 
-def get_all_members():
-    guild = client.get_guild(862542952937029632)
-    memberList = guild.members
-    return memberList
-
-def get_member_days(member):
-    today = date.today()
-    d1 = today.strftime("%d/%m/%Y")
-    mem_join = member.joined_at
-    member_join_date = mem_join.strftime("%d/%m/%Y")
-    date0 = d1
-    date1 = member_join_date
-    day0 = int(date0[:2])
-    morep0 = date0.replace("/", "")
-    month0 = int(morep0[2:-4])
-    year0 = int(date0[6:])
-    day1 = int(date1[:2])
-    morep1 = date1.replace("/", "")
-    month1 = int(morep1[2:-4])
-    year1 = int(date1[6:])
-    date0 = date(year0, month0, day0)
-    date1 = date(year1, month1, day1)
-    delta = date0 - date1
-    return delta.days
 
 client.run(os.getenv('BOT_TOKEN'))
