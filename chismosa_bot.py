@@ -52,9 +52,11 @@ async def on_message(message):
 
     if message.content == "prueba":
         mem_list = get_all_members()
-        member_list = []
-        for items in mem_list:
-            print(type(items))
+        for member in mem_list:
+            if str(member) == "JuanC#6084":
+                test = discord.utils.get(member.guild.roles, name="Hermanastra")
+                print(test)
+                await member.add_roles(test)
 
     if message.content == "members_count":
         mem_list = get_all_members()
