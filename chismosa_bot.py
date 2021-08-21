@@ -5,6 +5,8 @@ from datetime import date
 from dotenv import load_dotenv
 import re
 from utils import remove_tag, get_chisme, get_quote
+import schedule
+import time
 
 intents = discord.Intents.default()
 intents.members = True
@@ -36,6 +38,39 @@ def get_member_days(member):
     delta = date0 - date1
     return delta.days
 
+async def role_routine():
+    member_list = get_all_members()
+    for member in member_list:
+            days = get_member_days(member)
+            roles = member.roles
+            role = discord.utils.get(member.guild.roles, name="Spambot 🤖")
+            if role in roles:
+                continue
+            if days >= 30 and days < 90:
+                new_role = discord.utils.get(member.guild.roles, name="Sister")
+                old_role = discord.utils.get(member.guild.roles, name="Hermanastra")
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
+            elif days >= 90 and days < 180:
+                new_role = discord.utils.get(member.guild.roles, name="Sister Menor")
+                old_role = discord.utils.get(member.guild.roles, name="Sister")
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
+            elif days >= 180 and days < 300:
+                new_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
+                old_role = discord.utils.get(member.guild.roles, name="Sister Menor")
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
+            elif days >= 300:
+                new_role = discord.utils.get(member.guild.roles, name="Sister Mayor")
+                old_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
+            else:
+                continue
+
+schedule.every().day.at("00:00").do(role_routine)
+
 @client.event
 async def get_member_day(message):
     print('working')
@@ -51,12 +86,7 @@ async def on_message(message):
         return
 
     if message.content == "prueba":
-        mem_list = get_all_members()
-        for member in mem_list:
-            if str(member) == "JuanC#6084":
-                test = discord.utils.get(member.guild.roles, name="Hermanastra")
-                print(test)
-                await member.add_roles(test)
+        print("prueba")
 
     if message.content == "members_count":
         mem_list = get_all_members()
@@ -109,4 +139,4 @@ async def on_message(message):
         await message.channel.send("At least take me to dinner first!:flushed:")
 
 
-client.run(os.getenv('BOT_TOKEN'))
+client.run('ODYyNzg2MTg4NjQ1NjI5OTcz.YOdaQQ.7ozntKOhblNQP5b6gLNzEHdw_Ns')
