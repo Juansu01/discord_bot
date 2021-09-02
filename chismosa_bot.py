@@ -7,12 +7,15 @@ import re
 from utils import remove_tag, get_chisme, get_quote
 import schedule
 import time
+import asyncio
+from discord.ext import commands, tasks
+from datetime import datetime, timedelta
 
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix=',', intents=intents)
 load_dotenv('.env')
-my_secret = os.environ['token']
+#my_secret = os.environ['token']
 
 def get_all_members():
     guild = client.get_guild(862542952937029632)
@@ -39,38 +42,54 @@ def get_member_days(member):
     delta = date0 - date1
     return delta.days
 
+@tasks.loop(hours=24)
 async def role_routine():
     member_list = get_all_members()
     for member in member_list:
-            days = get_member_days(member)
-            roles = member.roles
-            role = discord.utils.get(member.guild.roles, name="Spambot 🤖")
-            if role in roles:
-                continue
-            if days >= 30 and days < 90:
-                new_role = discord.utils.get(member.guild.roles, name="Sister")
-                old_role = discord.utils.get(member.guild.roles, name="Hermanastra")
-                await member.add_roles(new_role)
-                await member.remove_roles(old_role)
-            elif days >= 90 and days < 180:
-                new_role = discord.utils.get(member.guild.roles, name="Sister Menor")
-                old_role = discord.utils.get(member.guild.roles, name="Sister")
-                await member.add_roles(new_role)
-                await member.remove_roles(old_role)
-            elif days >= 180 and days < 300:
-                new_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
-                old_role = discord.utils.get(member.guild.roles, name="Sister Menor")
-                await member.add_roles(new_role)
-                await member.remove_roles(old_role)
-            elif days >= 300:
-                new_role = discord.utils.get(member.guild.roles, name="Sister Mayor")
-                old_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
-                await member.add_roles(new_role)
-                await member.remove_roles(old_role)
-            else:
-                continue
+        days = get_member_days(member)
+        roles = member.roles
+        role = discord.utils.get(member.guild.roles, name="Spambot 🤖")
+        if role in roles:
+            continue
+        if days >= 30 and days < 90:
+            print("Granting: {} role: Sister".format(member))
+            new_role = discord.utils.get(member.guild.roles, name="Sister")
+            old_role = discord.utils.get(member.guild.roles, name="Hermanastra")
+            await member.add_roles(new_role)
+            await member.remove_roles(old_role)
+        elif days >= 90 and days < 180:
+            print("Granting: {} role: Sister Menor".format(member))
+            new_role = discord.utils.get(member.guild.roles, name="Sister Menor")
+            old_role = discord.utils.get(member.guild.roles, name="Sister")
+            await member.add_roles(new_role)
+            await member.remove_roles(old_role)
+        elif days >= 180 and days < 300:
+            print("Granting: {} role: Hermana del Medio".format(member))
+            new_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
+            old_role = discord.utils.get(member.guild.roles, name="Sister Menor")
+            await member.add_roles(new_role)
+            await member.remove_roles(old_role)
+        elif days >= 300:
+            print("Granting: {} role: Sister Mayor".format(member))
+            new_role = discord.utils.get(member.guild.roles, name="Sister Mayor")
+            old_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
+            await member.add_roles(new_role)
+            await member.remove_roles(old_role)
+        else:
+            continue
 
-schedule.every().day.at("00:00").do(role_routine)
+@role_routine.before_loop
+async def before_my_task():
+    hour = 21
+    minute = 57
+    await bot.wait_until_ready()
+    now = datetime.now()
+    future = datetime.datetime(now.year, now.month, now.day, hour, minute)
+    if now.hour >= hour and now.minute > minute:
+        future += timedelta(days=1)
+    await asyncio.sleep((future-now).seconds)
+
+role_routine.start()
 
 @client.event
 async def get_member_day(message):
@@ -87,7 +106,7 @@ async def on_message(message):
         return
 
     if message.content == "prueba":
-        print("prueba")
+        pass
 
     if message.content == "members_count":
         mem_list = get_all_members()
@@ -140,4 +159,4 @@ async def on_message(message):
         await message.channel.send("At least take me to dinner first!:flushed:")
 
 
-client.run(my_secret)
+client.run('ODgyNjUxNjQ4Nzg1MjUyNDIz.YS-fZw.tOGbCEGD2r1J00H7TNBR1L8na_A')
