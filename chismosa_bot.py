@@ -12,6 +12,7 @@ intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix=',', intents=intents)
 load_dotenv('.env')
+my_secret = os.environ['token']
 
 def get_all_members():
     guild = client.get_guild(862542952937029632)
@@ -139,4 +140,4 @@ async def on_message(message):
         await message.channel.send("At least take me to dinner first!:flushed:")
 
 
-client.run('ODYyNzg2MTg4NjQ1NjI5OTcz.YOdaQQ.7ozntKOhblNQP5b6gLNzEHdw_Ns')
+client.run(my_secret)
