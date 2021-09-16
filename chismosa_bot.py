@@ -5,17 +5,20 @@ from datetime import date
 from dotenv import load_dotenv
 import re
 from utils import remove_tag, get_chisme, get_quote
-import schedule
-import time
 import asyncio
-from discord.ext import commands, tasks
+from discord.ext import tasks
 from datetime import datetime, timedelta
+from keep_alive import keep_alive
+import random
 
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix=',', intents=intents)
 load_dotenv('.env')
-#my_secret = os.environ['token']
+my_secret = os.environ['key']
+
+def trigger_function():
+    asyncio.run(role_routine())
 
 def get_all_members():
     guild = client.get_guild(862542952937029632)
@@ -42,8 +45,10 @@ def get_member_days(member):
     delta = date0 - date1
     return delta.days
 
-@tasks.loop(hours=24)
+
 async def role_routine():
+    channel = client.get_channel(862591362369191966)
+    await channel.send("Checking roles :woman_technologist:")
     member_list = get_all_members()
     for member in member_list:
         days = get_member_days(member)
@@ -77,19 +82,8 @@ async def role_routine():
             await member.remove_roles(old_role)
         else:
             continue
+    await channel.send("All members checked:white_check_mark: :woman_tipping_hand:")
 
-@role_routine.before_loop
-async def before_my_task():
-    hour = 21
-    minute = 57
-    await bot.wait_until_ready()
-    now = datetime.now()
-    future = datetime.datetime(now.year, now.month, now.day, hour, minute)
-    if now.hour >= hour and now.minute > minute:
-        future += timedelta(days=1)
-    await asyncio.sleep((future-now).seconds)
-
-role_routine.start()
 
 @client.event
 async def get_member_day(message):
@@ -105,8 +99,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content == "prueba":
-        pass
+    if message.content == "do routine":
+        if str(message.author) == "JuanC#1899":
+          await role_routine()
 
     if message.content == "members_count":
         mem_list = get_all_members()
@@ -157,6 +152,29 @@ async def on_message(message):
 
     if re.match(re.compile("s+e+n+d+ n+u+d+e+s+", re.I), message.content):
         await message.channel.send("At least take me to dinner first!:flushed:")
+    
+    if re.search(re.compile("(l+i+k+e+|l+o+v+e+)", re.I), message.content):
+        return
+        n = random.randint(0, 1)
+        if n == 0:
+          await message.channel.send("i… LOVE :woman_gesturing_ok:")
+        else:
+          await message.channel.send("I literally LOVE :woman_gesturing_ok:")
 
+    if message.content == "Count our sisters":
+        members = get_all_members()
+        count = len(members)
+        await message.channel.send("We currently have {} sisters :woman_technologist: ".format(count))
 
-client.run('ODgyNjUxNjQ4Nzg1MjUyNDIz.YS-fZw.tOGbCEGD2r1J00H7TNBR1L8na_A')
+@tasks.loop(hours=24)
+async def called_once_a_day():
+    await role_routine()
+
+@called_once_a_day.before_loop
+async def before():
+    await client.wait_until_ready()
+    print("Finished waiting")
+
+called_once_a_day.start()
+keep_alive()
+client.run(my_secret)
