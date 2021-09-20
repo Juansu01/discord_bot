@@ -125,8 +125,12 @@ async def on_message(message):
     if re.match(re.compile("days all", re.I), message.content):
         members = get_all_members()
         names = []
+        member_dict = {}
         for member in members:
-            names.append("@{}: {} days".format(remove_tag(str(member)), get_member_days(member)))
+            member_dict[remove_tag(str(member))] = get_member_days(member)
+        sorted_member_dict = sorted(member_dict.items(), key=lambda x: x[1], reverse=True)
+        for item in sorted_member_dict:  
+            names.append("@{}: {} days".format(item[0], item[1]))
         await message.channel.send("\n".join(names))
 
     if re.match("days [a-z0-9_]+", message.content.lower()):
