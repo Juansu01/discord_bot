@@ -18,8 +18,7 @@ load_dotenv('.env')
 my_secret = os.environ['key']
 
 def trigger_function():
-    asyncio.run(role_routine())
-
+  asyncio.run(role_routine())
 def get_all_members():
     guild = client.get_guild(862542952937029632)
     memberList = guild.members
@@ -51,39 +50,52 @@ async def role_routine():
     await channel.send("Checking roles :woman_technologist:")
     member_list = get_all_members()
     for member in member_list:
+        print("Checking: {}".format(member))
         days = get_member_days(member)
         roles = member.roles
         role = discord.utils.get(member.guild.roles, name="Spambot 🤖")
         if role in roles:
             continue
         if days >= 30 and days < 90:
-            print("Granting: {} role: Sister".format(member))
             new_role = discord.utils.get(member.guild.roles, name="Sister")
             old_role = discord.utils.get(member.guild.roles, name="Hermanastra")
-            await member.add_roles(new_role)
-            await member.remove_roles(old_role)
+            if new_role not in roles:
+                print("Granting: {} role: Sister".format(member))
+                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
         elif days >= 90 and days < 180:
-            print("Granting: {} role: Sister Menor".format(member))
             new_role = discord.utils.get(member.guild.roles, name="Sister Menor")
             old_role = discord.utils.get(member.guild.roles, name="Sister")
-            await member.add_roles(new_role)
-            await member.remove_roles(old_role)
+            if new_role not in roles:
+                print("Granting: {} role: Sister Menor".format(member))
+                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
         elif days >= 180 and days < 300:
-            print("Granting: {} role: Hermana del Medio".format(member))
             new_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
             old_role = discord.utils.get(member.guild.roles, name="Sister Menor")
-            await member.add_roles(new_role)
-            await member.remove_roles(old_role)
+            if new_role not in roles:
+                print("Granting: {} role: Hermana del Medio".format(member))
+                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
         elif days >= 300:
-            print("Granting: {} role: Sister Mayor".format(member))
             new_role = discord.utils.get(member.guild.roles, name="Sister Mayor")
             old_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
-            await member.add_roles(new_role)
-            await member.remove_roles(old_role)
+            if new_role not in roles:
+                print("Granting: {} role: Sister Mayor".format(member))
+                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await member.add_roles(new_role)
+                await member.remove_roles(old_role)
         else:
             continue
     await channel.send("All members checked:white_check_mark: :woman_tipping_hand:")
 
+@client.event
+async def on_member_join(member):
+    new_role = discord.utils.get(member.guild.roles, name="Hermanastra")
+    await member.add_roles(new_role)
 
 @client.event
 async def get_member_day(message):
@@ -101,6 +113,7 @@ async def on_message(message):
 
     if message.content == "do routine":
         if str(message.author) == "JuanC#1899":
+          print("im here")
           await role_routine()
 
     if message.content == "members_count":
@@ -158,7 +171,6 @@ async def on_message(message):
         await message.channel.send("At least take me to dinner first!:flushed:")
     
     if re.search(re.compile("(l+i+k+e+|l+o+v+e+)", re.I), message.content):
-        return
         n = random.randint(0, 1)
         if n == 0:
           await message.channel.send("i… LOVE :woman_gesturing_ok:")
