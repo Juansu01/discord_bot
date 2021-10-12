@@ -4,10 +4,10 @@ from discord.ext import commands
 from datetime import date
 from dotenv import load_dotenv
 import re
-from utils import remove_tag, get_chisme, get_quote
+from utils import remove_tag, get_chisme, get_quote, update_chismes, delete_chisme
 import asyncio
 from discord.ext import tasks
-from datetime import datetime, timedelta
+from replit import db
 from keep_alive import keep_alive
 import random
 
@@ -16,6 +16,8 @@ intents.members = True
 client = commands.Bot(command_prefix=',', intents=intents)
 load_dotenv('.env')
 my_secret = os.environ['key']
+
+chisme_permissions = ["Shubham#2936", "JuanC#1899"]
 
 def trigger_function():
   asyncio.run(role_routine())
@@ -69,7 +71,7 @@ async def role_routine():
             old_role = discord.utils.get(member.guild.roles, name="Sister")
             if new_role not in roles:
                 print("Granting: {} role: Sister Menor".format(member))
-                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await channel.send("{} is now a Sister Menor!".format(remove_tag(str(member))))
                 await member.add_roles(new_role)
                 await member.remove_roles(old_role)
         elif days >= 180 and days < 300:
@@ -77,7 +79,7 @@ async def role_routine():
             old_role = discord.utils.get(member.guild.roles, name="Sister Menor")
             if new_role not in roles:
                 print("Granting: {} role: Hermana del Medio".format(member))
-                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await channel.send("{} is now a Hermana del Medio!".format(remove_tag(str(member))))
                 await member.add_roles(new_role)
                 await member.remove_roles(old_role)
         elif days >= 300:
@@ -85,12 +87,12 @@ async def role_routine():
             old_role = discord.utils.get(member.guild.roles, name="Hermana del Medio")
             if new_role not in roles:
                 print("Granting: {} role: Sister Mayor".format(member))
-                await channel.send("{} is now a Sister!".format(remove_tag(str(member))))
+                await channel.send("{} is now a Sister Mayor!".format(remove_tag(str(member))))
                 await member.add_roles(new_role)
                 await member.remove_roles(old_role)
         else:
             continue
-    await channel.send("All members checked:white_check_mark: :woman_tipping_hand:")
+    await channel.send("All members checked :white_check_mark: :woman_tipping_hand:")
 
 @client.event
 async def on_member_join(member):
@@ -111,15 +113,35 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if message.content == "Chismosa help":
+        embed = discord.Embed(title="Help with La Chismosa", description="List of Chismosa commands:")
+        embed.add_field(name="Chismosa I'm depressed", value="Use this command to get an inspiring message from Jaime Carlos.")
+        embed.add_field(name="Chisme", value="Get a chisme from La Chismosa.")
+        embed.add_field(name="Days All", value="Displays a list of all members showing the days they have been on the server.")
+        embed.add_field(name="Days <username>", value="La Chismosa will tell you the days this user has.")
+        embed.add_field(name="My Days", value="La Chismosa will tell you your days.")
+        embed.add_field(name="Members Count", value="Counts current members, including bots, 'cus bots are also sisterss.")
+        embed.add_field(name="New Chisme <chisme>", value="Add a new chisme.")
+        embed.add_field(name="Del Chisme <number>", value="Deletes a chisme, number is the positon of the chisme in the current chisme list.")
+        embed.add_field(name="List Chismes", value="Shows all the chismes that La Chismosa is currently holding.")
+        await message.channel.send(content=None, embed=embed)
+
     if message.content == "do routine":
         if str(message.author) == "JuanC#1899":
           print("im here")
           await role_routine()
 
-    if message.content == "members_count":
+    if message.content == "Members Count":
         mem_list = get_all_members()
         for member in mem_list:
             print("Member: {} Days in server: {}".format(member, get_member_days(member)))
+
+    if message.content == "List Chismes":
+      chisme_list = list(db["chismes"])
+      tuple_list = []
+      for (i, item) in enumerate(chisme_list , start=1):
+          tuple_list.append("({}) {}".format(i, item))
+      await message.channel.send("\n".join(tuple_list))
 
     if message.content == "Chismosa I'm depressed":
         quote = get_quote()
@@ -129,8 +151,10 @@ async def on_message(message):
         await message.channel.send("Oula jermana, ya compraste tu paleta de James Charles hoy?:sunglasses:")
 
     if message.content.lower() == 'chisme':
-        chisme = get_chisme()
-        await message.channel.send(chisme)
+        try:
+            await message.channel.send(random.choice(db["chismes"]))
+        except:
+            await message.channel.send("We don't have any chismes yet")
 
     if re.match(re.compile("chismosa (te|té)", re.I), message.content):
         await message.channel.send("Derrama el té sister!!!:tea:")
@@ -181,6 +205,34 @@ async def on_message(message):
         members = get_all_members()
         count = len(members)
         await message.channel.send("We currently have {} sisters :woman_technologist: ".format(count))
+
+    if message.content.startswith("New Chisme"):
+        if str(message.author) not in chisme_permissions:
+            await message.channel.send("Gurl, you're liek, not allowed to do that :face_with_hand_over_mouth:")
+            return
+        chisme = str(message.content).replace("New Chisme ", "")
+        update_chismes(chisme)
+        await message.channel.send("Ummhgg, qué buen chisme hermana, tengo que guardarlo :woman_tipping_hand:")
+
+    if message.content.startswith("Del Chisme"):
+        if str(message.author) not in chisme_permissions:
+              await message.channel.send("Gurl, you're liek, not allowed to do that :face_with_hand_over_mouth:")
+              return
+        if 'chismes' in db.keys():
+            index = int(message.content.split('Del Chisme ',1)[1])
+            index = index - 1
+            print(index)
+            res = delete_chisme(index)
+            if res == True:
+                await message.channel.send("Ugh I hated that Chisme, it's gone now :face_gun_smiling:")
+            else:
+                await message.channel.send("Hermanaa, we don't have that many chismes :pinching_hand:")
+
+    if message.content.startswith("Vamos lá?"):
+        await message.channel.send("Está bem, você não sai daí :nail_care::flag_br:")
+
+    if re.match(re.compile("c+h+i+s+m+o+s+a+ +i+ +l+i+k+e+ +m+e+n+", re.I), message.content):
+      await message.channel.send("Bien ahí, sigue así, mi nena :woman_tipping_hand:")
 
 @tasks.loop(hours=24)
 async def called_once_a_day():

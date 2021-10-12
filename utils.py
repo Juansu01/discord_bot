@@ -1,5 +1,6 @@
 import requests
 import json
+from replit import db
 
 def remove_tag(username):
     chars = []
@@ -20,3 +21,20 @@ def get_chisme():
     json_data = json.loads(chisme.text)
     quote = json_data['quote']['quote']
     return quote
+
+def update_chismes(chisme):
+    if "chismes" in db.keys():
+        chismes = list(db["chismes"])
+        chismes.append(chisme)
+        db["chismes"] = chismes
+    else:
+        db["chismes"] = chisme
+
+def delete_chisme(index):
+    chismes = db["chismes"]
+    if len(chismes) > index:
+        del chismes[index]
+        db["chismes"] = chismes
+        return True
+    else:
+        return False
